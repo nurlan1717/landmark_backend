@@ -12,12 +12,20 @@ const globalErrorHandler = require('./controllers/errorController');
 const morgan = require('morgan');
 const swaggerUi = require("swagger-ui-express");
 const swaggerDocument = require("./swagger-output.json");
+const cors = require("cors")
 
 let app = express();
 
 app.use(helmet());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
+app.use(cors({
+    origin: 'http://localhost:3000', 
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    credentials: true,
+    allowedHeaders: ['Content-Type', 'Authorization']
+  }));
+  
 
 if (process.env.NODE_ENV === 'development') {
     app.use(morgan('dev'));
