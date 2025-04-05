@@ -1,7 +1,7 @@
 const Product = require('../models/productModel');
-const APIFeatures = require('../utils/APIFeatures');
 const catchAsync = require('../utils/catchAsync');
 const AppError = require("../utils/appError");
+const APIFeatures = require('../utils/apiFeatures');
 
 exports.getAllProducts = catchAsync(async (req, res, next) => {
     const features = new APIFeatures(Product.find(), req.query)
@@ -18,18 +18,18 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 });
 
 exports.getProductById = catchAsync(async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const oneProduct = await Product.findById(id)
 
     if (!oneProduct) {
-        return next(new AppError('No car with id ' + id, 404 ));
+        return next(new AppError('No car with id ' + id, 404));
     }
 
     res.status(200).json(oneProduct);
 })
 
 exports.editProductById = catchAsync(async (req, res, next) => {
-    const {id} = req.params;
+    const { id } = req.params;
     const updatedProduct = await Product.findByIdAndUpdate(id,
         req.body,
         {
@@ -38,7 +38,7 @@ exports.editProductById = catchAsync(async (req, res, next) => {
         })
 
     if (!updatedProduct) {
-        return next(new AppError('No car with id ' + id, 404 ));
+        return next(new AppError('No car with id ' + id, 404));
     }
 
     res.status(200).json({
@@ -56,11 +56,11 @@ exports.createProduct = catchAsync(async (req, res, next) => {
 })
 
 exports.deleteProductById = catchAsync(async (req, res, next) => {
-        const {id} = req.params;
-        const deletedProduct = await Car.findByIdAndDelete(id);
-        if (!deletedProduct) {
-            return next(new AppError('No car with id ' + id, 404 ));
-        }
-        res.status(204).json({"status": "success", "data": null})
+    const { id } = req.params;
+    const deletedProduct = await Car.findByIdAndDelete(id);
+    if (!deletedProduct) {
+        return next(new AppError('No car with id ' + id, 404));
     }
+    res.status(204).json({ "status": "success", "data": null })
+}
 )

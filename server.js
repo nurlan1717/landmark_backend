@@ -1,6 +1,8 @@
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
 const sendMessageTG = require("./utils/sendMessageTG");
+const cors = require('cors');
+
 
 process.on('uncaughtException',async err => {
     console.log('UNCAUGHT EXCEPTION!  Shutting down...');
@@ -26,6 +28,13 @@ mongoose.connect(db, {})
         console.log("Cannot connect to DB")
     });
 
+
+app.use(cors({
+  origin: 'http://localhost:3000', 
+  methods: ['GET', 'POST', 'PUT', 'DELETE'],
+  credentials: true,
+  allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 
 const server = app.listen(process.env.PORT || 3000, () => {
