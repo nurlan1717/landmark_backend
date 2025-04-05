@@ -20,7 +20,7 @@ app.use(helmet());
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 app.use(cors({
-    origin: 'http://localhost:3000', 
+    origin: ['http://localhost:3000', 'https://rackspace-zeta.vercel.app'],
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
