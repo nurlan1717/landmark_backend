@@ -29,12 +29,12 @@ mongoose.connect(db, {})
     });
 
 
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+    app.use(cors({
+        origin: ['http://localhost:3000', 'https://rackspace-zeta.vercel.app'],
+        methods: ['GET', 'POST', 'PUT', 'DELETE'],
+        credentials: true,
+        allowedHeaders: ['Content-Type', 'Authorization']
+      }));
 
 
 const server = app.listen(process.env.PORT || 3000, () => {
