@@ -1,56 +1,52 @@
 const mongoose = require("mongoose");
 const dotenv = require('dotenv');
-const sendMessageTG = require("./utils/sendMessageTG");
-const cors = require('cors');
 
-
-process.on('uncaughtException',async err => {
-    console.log('UNCAUGHT EXCEPTION!  Shutting down...');
-    console.log(err.name, err.message);
-    // sendMessageTG('UNCAUGHT EXCEPTION!  Shutting down...');
-
-
+process.on('uncaughtException', err => {
+    console.error('UNCAUGHT EXCEPTION! Shutting down...');
+    console.error(err.name, err.message, err.stack);
+    process.exit(1); 
 });
 
-dotenv.config({path: './config.env'});
+dotenv.config({ path: './config.env' });
 
 const app = require('./app');
 
+const DB = process.env.DATABASE_URL
 
-let db = process.env.DATABASE_URL.replace('<db_username>', process.env.DB_USERNAME);
-db = db.replace('<db_password>', process.env.DB_PASS);
+const mongooseOptions = {
+    serverSelectionTimeoutMS: 5000, 
+    socketTimeoutMS: 45000,
+    connectTimeoutMS: 30000
+};
 
-mongoose.connect(db, {})
-    .then(() => {
-        console.log("Connected to DB")
-    })
-    .catch(() => {
-        console.log("Cannot connect to DB")
-    });
-
-
-app.use(cors({
-  origin: 'http://localhost:3000', 
-  methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  credentials: true,
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
-
-
-const server = app.listen(process.env.PORT || 3000, () => {
-    console.log("Environment is " + process.env.NODE_ENV);
-    console.log("Server started on port " + process.env.PORT + "!");
-    // sendMessageTG("Server started on port " + process.env.PORT + "!");
-    // sendMessageTG("Environment is " + process.env.NODE_ENV);
-});
-
-console.log(process.env);
-process.on('unhandledRejection', err => {
-    sendMessageTG(err);
-    console.log('UNHANDLED REJECTION! 💥 Shutting down...');
-    console.log(err.name, err.message);
-    server.close(() => {
+mongoose.connect(DB, mongooseOptions)
+    .then(() => console.log("✅ Connected to DB successfully"))
+    .catch(err => {
+        console.error("❌ DB connection error:", err.message);
         process.exit(1);
     });
+
+const port = process.env.PORT || 3000;
+const server = app.listen(port, () => {
+    console.log(`🌐 Environment: ${process.env.NODE_ENV}`);
+    console.log(`🚀 Server running on port ${port}`);
 });
 
+process.on('unhandledRejection', err => {
+    console.error('UNHANDLED REJECTION! Shutting down...');
+    console.error(err.name, err.message);
+    
+    server.close(() => {
+        mongoose.connection.close(false, () => {
+            console.log('MongoDB connection closed');
+            process.exit(1);
+        });
+    });
+});
+
+process.on('SIGTERM', () => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down gracefully');
+    server.close(() => {
+        console.log('💥 Process terminated!');
+    });
+});

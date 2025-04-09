@@ -1,26 +1,25 @@
 const nodemailer = require('nodemailer');
 
+const sendEmail = async (options) => {
+  const transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+      user: process.env.EMAIL_USERNAME,
+      pass: process.env.EMAIL_PASSWORD
+    },
+    debug: true,
+    logger: true
+  });
 
-const sendEmail = async options => {
-    const transporter = nodemailer.createTransport({
-        host : process.env.EMAIL_HOST,
-        port: process.env.EMAIL_PORT,
-        auth: {
-            user : process.env.EMAIL_USERNAME,
-            pass : process.env.EMAIL_PASSWORD
-        },
+  const mailOptions = {
+    from: `Support Team <${process.env.EMAIL_FROM}>`,
+    to: options.email,
+    subject: options.subject,
+    text: options.message || '',
+    html: options.html || '',
+  };
 
-    })
-
-    const mailOptions = {
-        from : "Forgot Mailer <1737716958@demomailtrap.com>",
-        to : options.email,
-        subject: options.subject,
-        text : options.message,
-    }
-
-    await transporter.sendMail(mailOptions)
-
-}
+  await transporter.sendMail(mailOptions);
+};
 
 module.exports = sendEmail;
