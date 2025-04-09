@@ -10,7 +10,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
         .search()
         .limitFields()
         .paginate();
-    const allProducts = await features.query;
+    const allProducts = await features.query.populate('seller', 'firstname lastname email');;
     res.status(200).json({
         status: "success",
         data: allProducts,
@@ -19,7 +19,7 @@ exports.getAllProducts = catchAsync(async (req, res, next) => {
 
 exports.getProductById = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const oneProduct = await Product.findById(id)
+    const oneProduct = await Product.findById(id).populate('seller', 'firstname lastname email');
 
     if (!oneProduct) {
         return next(new AppError('No car with id ' + id, 404));
@@ -48,19 +48,29 @@ exports.editProductById = catchAsync(async (req, res, next) => {
 })
 
 exports.createProduct = catchAsync(async (req, res, next) => {
-    let newProduct = await Product.create(req.body);
-    res.status(201).json({
-        "status": "success",
-        "data": newProduct
-    });
-})
+    try {
+        let newProduct = await Product.create(req.body);
+        newProduct = await Product.findById(newProduct._id).populate('seller', 'firstname lastname email');
+        res.status(201).json({
+            status: "success",
+            data: newProduct
+        });
+    } catch (error) {
+        console.error(error); 
+        next(error); 
+    }
+});
 
 exports.deleteProductById = catchAsync(async (req, res, next) => {
     const { id } = req.params;
-    const deletedProduct = await Car.findByIdAndDelete(id);
+
+
+    const deletedProduct = await Product.findByIdAndDelete(id);
+
     if (!deletedProduct) {
-        return next(new AppError('No car with id ' + id, 404));
+        return next(new AppError('No product with id ' + id, 404));
     }
-    res.status(204).json({ "status": "success", "data": null })
-}
-)
+
+
+    res.status(204).json({ status: "success", data: null });
+});
