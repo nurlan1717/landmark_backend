@@ -62,8 +62,18 @@ const createVerificationEmail = (name, url) => {
 };
 
 exports.signUp = catchAsync(async (req, res, next) => {
+    let newUser;
+    
     try {
-        const newUser = await User.create({
+        const existingUser = await User.findOne({ email: req.body.email });
+        if (existingUser) {
+            return res.status(409).json({
+                status: 'error',
+                message: 'Bu email ünvanı artıq istifadə olunub. Zəhmət olmasa başqa email ünvanı yoxlayın.'
+            });
+        }
+
+        newUser = await User.create({
             firstname: req.body.firstname,
             lastname: req.body.lastname,
             email: req.body.email,
@@ -77,11 +87,10 @@ exports.signUp = catchAsync(async (req, res, next) => {
         });
 
         const verifyToken = newUser.createEmailVerifyToken();
-
         await newUser.save({ validateBeforeSave: false });
 
         const verifyURL = `${req.protocol}://${req.get('host')}/api/users/verify-email/${newUser.emailVerifyToken}`;
-
+        
         await sendEmail({
             email: newUser.email,
             subject: 'Email Doğrulama - Hesabınızı Aktivləşdirin',
@@ -91,7 +100,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
                   Link 24 saat ərzində etibarlıdır.`
         });
 
-        res.status(200).json({
+        return res.status(200).json({
             status: 'success',
             message: 'Doğrulama linki email ünvanınıza göndərildi! Zəhmət olmasa emailinizi təsdiqləyin.',
             data: {
@@ -111,7 +120,22 @@ exports.signUp = catchAsync(async (req, res, next) => {
             await newUser.save({ validateBeforeSave: false });
         }
 
-        return next(new AppError('Email göndərilərkən xəta baş verdi! Zəhmət olmasa daha sonra yenidən cəhd edin.', 500));
+        let errorMessage = 'Qeydiyyat zamanı gözlənilməz xəta baş verdi. Zəhmət olmasa daha sonra yenidən cəhd edin.';
+        let statusCode = 500;
+
+        if (err.name === 'ValidationError') {
+            errorMessage = 'Yanlış məlumat daxil edilib. Zəhmət olmasa bütün sahələri düzgün doldurun.';
+            statusCode = 400;
+        } else if (err.code === 11000) {
+            errorMessage = 'Bu email ünvanı artıq istifadə olunub. Zəhmət olmasa başqa email ünvanı yoxlayın.';
+            statusCode = 409;
+        }
+
+        return res.status(statusCode).json({
+            status: 'error',
+            message: errorMessage,
+            ...(process.env.NODE_ENV === 'development' && { error: err.message })
+        });
     }
 });
 
