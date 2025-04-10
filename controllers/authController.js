@@ -63,7 +63,7 @@ const createVerificationEmail = (name, url) => {
 
 exports.signUp = catchAsync(async (req, res, next) => {
     let newUser;
-    
+
     try {
         const existingUser = await User.findOne({ email: req.body.email });
         if (existingUser) {
@@ -90,7 +90,7 @@ exports.signUp = catchAsync(async (req, res, next) => {
         await newUser.save({ validateBeforeSave: false });
 
         const verifyURL = `${req.protocol}://${req.get('host')}/api/users/verify-email/${newUser.emailVerifyToken}`;
-        
+
         await sendEmail({
             email: newUser.email,
             subject: 'Email Doğrulama - Hesabınızı Aktivləşdirin',
@@ -140,12 +140,9 @@ exports.signUp = catchAsync(async (req, res, next) => {
 });
 
 exports.verifyEmail = catchAsync(async (req, res, next) => {
-    console.log('Email verification request started');
     const rawToken = req.params.token;
-    console.log('Raw token from URL:', rawToken);
 
     if (!rawToken || rawToken.length < 64) {
-        console.error('Invalid token format');
         return next(new AppError('Geçersiz doğrulama linki formatı', 400));
     }
 
@@ -165,12 +162,9 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
     user.emailVerifyToken = undefined;
     user.emailVerifyExpires = undefined;
 
-    console.log('Updating user...');
     await user.save({ validateBeforeSave: false });
-    console.log('User updated successfully');
 
-    console.log('Sending response...');
-    createSendToken(user, 200, res);
+    res.redirect('http://localhost:3000/');
 });
 
 exports.login = catchAsync(async (req, res, next) => {
