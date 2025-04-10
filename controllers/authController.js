@@ -164,7 +164,7 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 
     await user.save({ validateBeforeSave: false });
 
-    res.redirect('http://localhost:3000/');
+    res.redirect('https://rackspace-zeta.vercel.app/');
 });
 
 exports.login = catchAsync(async (req, res, next) => {
