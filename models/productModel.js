@@ -2,11 +2,11 @@ const mongoose = require('mongoose');
 const AppError = require('../utils/appError');
 
 const productSchema = new mongoose.Schema({
-    name: {type: String, required: [true, "Product name is required!"]},
-    description: {type: String, required: [true, "Product description is required!"]},
-    images: {
+    name: { type: String, required: [true, "Product name is required!"] },
+    description: { type: String, required: [true, "Product description is required!"] },
+    image: {
         type: [String],
-        required: true,
+        required: false,
         set: function (val) {
             if (!Array.isArray(val)) {
                 throw new AppError('Images must be an array!', 400);
@@ -23,13 +23,41 @@ const productSchema = new mongoose.Schema({
             message: 'Images must be an array of strings'
         }
     },
-    price: Number,
+    price: {
+        type: Number,
+        required: [true, 'Product price is required!'],
+        min: [0, 'Price must be at least 0']
+    },
     seller: {
-        type : mongoose.Schema.ObjectId,
-        ref : 'User',
+        type: mongoose.Schema.Types.ObjectId, 
+        ref: 'User',
         required: [true, "Seller of product is required!"]
     },
-})
+    weight: {
+        type: String,  
+        
+        required: [true, 'Unit of measurement is required!']
+    },
+    quantity: {
+        type: Number,
+        required: [true, 'Quantity is required!'],
+        min: [0, 'Quantity must be at least 0']
+    },
+    isAvailable: {
+        type: Boolean,
+        default: true
+    },
+    isOrganic: {
+        type: Boolean,
+        default: false
+    },
+    rating: {
+        type: Number,
+        min: 0,
+        max: 5,
+        default: 0
+    }
+}, { timestamps: true });
 
 const Product = mongoose.model('Product', productSchema);
 

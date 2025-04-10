@@ -21,7 +21,6 @@ exports.getAllUsers = catchAsync(async (req, res, next) => {
         .paginate();
     const allUsers= await features.query
 
-    console.log(allUsers)
     res.status(200).json({
         status: "success",
         data: allUsers,
