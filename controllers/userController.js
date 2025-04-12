@@ -56,16 +56,16 @@ exports.deleteMe = catchAsync(async (req, res, next) => {
     })
 })
 
-// exports.getUserById = catchAsync(async (req, res, next) => {
-//     const {id} = req.params;
-//     const oneUser = await User.findById(id)
-//
-//     if (!oneUser) {
-//         return next(new AppError('No user with id ' + id, 404 ));
-//     }
-//
-//     res.status(200).json(oneUser);
-// })
+exports.getUserById = catchAsync(async (req, res, next) => {
+    const {id} = req.params;
+    const oneUser = await User.findById(id)
+
+    if (!oneUser) {
+        return next(new AppError('No user with id ' + id, 404 ));
+    }
+
+    res.status(200).json(oneUser);
+})
 
 // exports.editUserById = catchAsync(async (req, res, next) => {
 //     const {id} = req.params;

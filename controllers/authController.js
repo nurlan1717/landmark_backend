@@ -168,42 +168,35 @@ exports.verifyEmail = catchAsync(async (req, res, next) => {
 });
 
 exports.login = catchAsync(async (req, res, next) => {
-    console.log('Login request body:', JSON.stringify(req.body));
     const { email, password } = req.body;
     if (!email || !password) {
-        console.log('Missing credentials - Email:', email, 'Password:', !!password);
         next(new AppError('Please provide email and password!', 400));
         return res.status(400).json({ error: 'Please provide email and password!' });
     }
 
     const user = await User.findOne({ email }).select('+password +active +emailVerified');
     if (!user) {
-        console.log('User not found with email:', email);
         next(new AppError('Incorrect email or password', 401));
         return res.status(400).json({ error: 'Incorrect email or password' });
     }
 
     const isPasswordCorrect = await user.correctPassword(password, user.password);
     if (!isPasswordCorrect) {
-        console.log('Incorrect password for email:', email);
         next(new AppError('Incorrect email or password', 401));
         return res.status(400).json({ error: 'Incorrect password for email' });
 
     }
 
     if (!user.active) {
-        console.log('Account not active for email:', email);
         next(new AppError('Your account has been deactivated', 403));
         return res.status(400).json({ error: 'Your account has been deactivated' });
     }
 
     if (!user.emailVerified) {
-        console.log('Email not verified for email:', email);
         next(new AppError('Email not verified for email!', 400));
         return res.status(400).json({ error: 'Pleace verify email' });
     }
 
-    console.log('Successful login for email:', email);
     createSendToken(user, 200, res);
 });
 
