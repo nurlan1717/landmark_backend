@@ -13,7 +13,7 @@ router
   .delete(basketController.clearBasket);
 
 router
-  .route('/:productId')
+  .route('/items/:productId')
   .patch(basketController.updateItemQuantity)
   .delete(basketController.removeItemFromBasket);
 
