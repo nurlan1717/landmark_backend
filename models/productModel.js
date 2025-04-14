@@ -56,6 +56,11 @@ const productSchema = new mongoose.Schema({
         min: 0,
         max: 5,
         default: 0
+    },
+    count: {
+        type: Number,
+        default: 0,
+        min: [0, 'Count cannot be negative']
     }
 }, { timestamps: true });
 
