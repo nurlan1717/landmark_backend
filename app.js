@@ -9,6 +9,7 @@ const mongoose = require("mongoose");
 const productsRouter = require("./routes/productsRouter");
 const usersRouter = require("./routes/usersRouter");
 const basketRouter = require("./routes/basketRoutes");
+const wishlistRouter = require("./routes/wishlistRouter")
 
 const AppError = require("./utils/appError");
 const globalErrorHandler = require("./controllers/errorController");
@@ -44,6 +45,7 @@ app.use(mongoSanitize());
 app.use("/api/products", productsRouter);
 app.use("/api/users", usersRouter);
 app.use("/api/basket", basketRouter);
+app.use("/api/wishlist", wishlistRouter);
 
 app.all("*", (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
