@@ -76,6 +76,10 @@ const userSchema = new mongoose.Schema({
         enum: ['user', 'seller', 'administrator'],
         select: false,
     },
+    fullname: {
+        type: String,
+      },
+      
     passwordChangedAt: Date,
     passwordResetToken: String,
     passwordResetExpires: Date,
@@ -92,9 +96,13 @@ userSchema.virtual('products', {
     localField: '_id'
 });
 
-userSchema.virtual('fullname').get(function () {
-    return `${this.firstname} ${this.lastname}`;
+
+
+userSchema.pre('save', function (next) {
+    this.fullname = `${this.firstname} ${this.lastname}`;
+    next();
 });
+
 
 userSchema.pre('save', async function (next) {
     if (!this.isModified("password")) return next();

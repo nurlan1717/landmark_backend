@@ -12,7 +12,7 @@ router.post('/resend-verification', authController.resendVerificationEmail);
 router.post('/forgot-password', authController.forgotPassword);
 router.patch('/reset-password/:token', authController.resetPassword);
 
-router.patch('/update-password', authController.updatePassword);
+router.patch('/update-password', authController.protect, authController.updatePassword);
 
 router.patch("/updateMe", authController.protect, userController.updateMe);
 router.patch("/deleteMe", authController.protect, userController.deleteMe);
