@@ -13,6 +13,7 @@ const filterObj = (obj, ...allowedFields) =>{
 
 exports.getAllUsers = catchAsync(async (req, res, next) => {
     // console.log(req.query)
+    const filterCriteria = req.query.role ? { role: req.query.role } : {}
     const features = new APIFeatures(User.find(), req.query)
         .filter()
         .sort()

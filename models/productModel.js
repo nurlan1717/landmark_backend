@@ -61,6 +61,31 @@ const productSchema = new mongoose.Schema({
         type: Number,
         default: 0,
         min: [0, 'Count cannot be negative']
+    },
+    productionLocation: {
+        type: String,
+        required: false
+    },
+    certificates: {
+        type: [String],
+        required: false
+    },
+    saleType: {
+        type: String,
+        enum: ['Online', 'Yerində'],
+        required: false
+    },
+    returnable: {
+        type: Boolean,
+        default: false
+    },
+    salesPoint: {
+        type: String,
+        required: false
+    },
+    schedule: {
+        type: String,
+        required: false
     }
 }, { timestamps: true });
 
