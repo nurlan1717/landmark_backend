@@ -310,16 +310,32 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.updatePassword = catchAsync(async (req, res, next) => {
-    const user = await User.findById(req.user.id).select('+password');
 
-    if (!(await user.correctPassword(req.body.passwordCurrent, user.password))) {
+    
+    const user = await User.findById(req.user._id).select('+password');
+    
+    if (!user) {
+        console.log('Error: User not found');
+        return next(new AppError('User not found', 404));
+    }
+    
+    const passwordCorrect = await user.correctPassword(req.body.passwordCurrent, user.password);
+    
+    if (!passwordCorrect) {
+        console.log('Password verification failed');
         return next(new AppError('Mevcut şifreniz yanlış!', 401));
     }
-
+    
+    
     user.password = req.body.password;
     user.passwordConfirm = req.body.passwordConfirm;
-    await user.save();
-
+    
+    try {
+        await user.save();
+    } catch (error) {
+        return next(new AppError('Password update failed during save', 500));
+    }
+    
     createSendToken(user, 200, res);
 });
 
