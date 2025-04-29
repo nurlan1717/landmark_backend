@@ -1,21 +1,23 @@
 const express = require('express');
 const productController = require('../controllers/productController');
-const {testId} = require('../middleware/middleware');
-const authController = require('../controllers/authController');
-const app = express();
+const sellerAuthController = require('../controllers/sellerAuthController');
+const { testId } = require('../middleware/middleware');
 
 const router = express.Router();
 
-// router.param('id', testId);
-
-router.route('/').post(productController.createProduct)
-    .get(productController.getAllProducts)
-//authController.restrictTo("user"),authController.protect, 
+router.route('/')
+  .get(productController.getAllProducts);
 
 router.route('/:id')
-    .get(productController.getProductById)
-    .patch(productController.editProductById)
-    .delete(productController.deleteProductById)
+  .get(productController.getProductById);
 
+router.use(sellerAuthController.protect);
+
+router.route('/')
+  .post(productController.createProduct);
+
+router.route('/:id')
+  .patch(productController.editProductById)
+  .delete(productController.deleteProductById);
 
 module.exports = router;
