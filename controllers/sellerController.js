@@ -1,9 +1,6 @@
 const Seller = require('../models/sellerModel');
 const AppError = require('../utils/appError');
 const catchAsync = require('../utils/catchAsync');
-const bcrypt = require('bcrypt')
-
-
 
 
 exports.createSeller = catchAsync(async (req, res, next) => {
