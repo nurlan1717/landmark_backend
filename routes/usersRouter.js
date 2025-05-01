@@ -1,10 +1,12 @@
 const express = require('express');
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
+const sellerController = require('./../controllers/sellerController')
 
 
 const router = express.Router();
 
+router.post('/createSeller',authController.protect, sellerController.createSeller);
 router.post('/signup', authController.signUp);
 router.post('/login', authController.login);
 router.get('/verify-email/:token', authController.verifyEmail);

@@ -44,6 +44,10 @@ const createSendToken = (user, statusCode, res) => {
     }
 };
 
+
+
+
+
 const createVerificationEmail = (name, url) => {
     return `
         <div style="font-family: Arial, sans-serif; line-height: 1.6; max-width: 600px; margin: 0 auto;">
@@ -249,11 +253,9 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
         return next(new AppError('Bu email adresine kayıtlı kullanıcı bulunamadı.', 404));
     }
 
-    // 2) Generate the random reset token
     const resetToken = user.createPasswordResetToken();
     await user.save({ validateBeforeSave: false });
 
-    // 3) Send it to user's email
     const resetURL = `${req.protocol}://${req.get('host')}/api/v1/auth/reset-password/${resetToken}`;
 
     try {
@@ -281,7 +283,6 @@ exports.forgotPassword = catchAsync(async (req, res, next) => {
 });
 
 exports.resetPassword = catchAsync(async (req, res, next) => {
-    // 1) Get user based on the token
     const hashedToken = crypto
         .createHash('sha256')
         .update(req.params.token)
@@ -292,7 +293,6 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
         passwordResetExpires: { $gt: Date.now() }
     });
 
-    // 2) If token has not expired, and there is user, set the new password
     if (!user) {
         return next(new AppError('Token geçersiz veya süresi dolmuş', 400));
     }
@@ -303,9 +303,7 @@ exports.resetPassword = catchAsync(async (req, res, next) => {
     user.passwordResetExpires = undefined;
     await user.save();
 
-    // 3) Update changedPasswordAt property for the user (handled in model pre-save middleware)
-
-    // 4) Log the user in, send JWT
+    
     createSendToken(user, 200, res);
 });
 
