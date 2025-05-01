@@ -23,8 +23,8 @@ const createSendToken = (seller, statusCode, res) => {
 
   seller.password = undefined;
 
-  res.cookie(statusCode).json({
-    status: "succes",
+  res.cookie('jwt', token, cookieOptions).status(statusCode).json({
+    status: "success",
     token,
     data: {
       seller,
@@ -56,6 +56,7 @@ exports.login = catchAsync(async (req, res, next) => {
     );
   }
 
+
   createSendToken(seller, 200, res);
 });
 
@@ -76,7 +77,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
   try {
     const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-    console.log('🔓 Decoded token payload:', {
+    console.log(' Decoded token payload:', {
       id: decoded.id,
       iat: new Date(decoded.iat * 1000).toISOString(),
       exp: new Date(decoded.exp * 1000).toISOString()

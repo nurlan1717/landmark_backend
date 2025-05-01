@@ -7,48 +7,39 @@ const bcrypt = require('bcrypt')
 
 
 exports.createSeller = catchAsync(async (req, res, next) => {
-    try {
-        const { name, surname, email, sellerCategory, certificate, age, location, photo, password } = req.body;
+  const { name, surname, email, sellerCategory, certificate, age, location, photo, password } = req.body;
 
-        if (!name || !surname || !email || !certificate || !age || !location || !password) {
-            return next(new AppError('Please provide all required fields: name, surname, email, certificate, age, location, password', 400));
-        }
+  if (!name || !surname || !email || !certificate || !age || !location || !password) {
+      return next(new AppError('Please provide all required fields: name, surname, email, certificate, age, location, password', 400));
+  }
 
-        // Проверка на существующего продавца с таким же email
-        const existingSeller = await Seller.findOne({ email });
-        if (existingSeller) {
-            return next(new AppError('Seller with this email already exists.', 400));
-        }
+  const existingSeller = await Seller.findOne({ email });
+  if (existingSeller) {
+      return next(new AppError('Seller with this email already exists.', 400));
+  }
 
-        const sellerData = {
-            name,
-            surname,
-            email,
-            sellerCategory: sellerCategory || 'Fruits', 
-            certificate,
-            age,
-            location,
-            photo: photo || 'https://thumbs.dreamstime.com/b/default-profile-picture-icon-high-resolution-high-resolution-default-profile-picture-icon-symbolizing-no-display-picture-360167031.jpg',  // Default photo if not provided
-            password
-        };
+  const sellerData = {
+      name,
+      surname,
+      email,
+      sellerCategory: sellerCategory || 'Fruits', 
+      certificate,
+      age,
+      location,
+      photo: photo || 'https://thumbs.dreamstime.com/b/default-profile-picture-icon-high-resolution-high-resolution-default-profile-picture-icon-symbolizing-no-display-picture-360167031.jpg',
+      password 
+  };
 
+  const newSeller = await Seller.create(sellerData);
 
-        sellerData.password = await bcrypt.hash(password, 12);
+  console.log('New seller created:', newSeller);
 
-        const newSeller = await Seller.create(sellerData);
-
-        console.log('New seller created:', newSeller);
-
-        res.status(201).json({
-            status: 'success',
-            data: {
-                seller: newSeller
-            }
-        });
-    } catch (error) {
-        console.error('Error creating seller:', error);
-        next(error);  // Pass error to error handler
-    }
+  res.status(201).json({
+      status: 'success',
+      data: {
+          seller: newSeller
+      }
+  });
 });
 
 

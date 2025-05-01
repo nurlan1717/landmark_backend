@@ -197,3 +197,15 @@ exports.deleteProductById= catchAsync(async (req, res, next) => {
     data: null
   });
 });
+
+
+
+exports.getMyProducts = catchAsync(async (req, res, next) => {
+  const products = await Product.find({ seller: req.seller._id });
+
+  res.status(200).json({
+    status: 'success',
+    results: products.length,
+    data: products
+  });
+});

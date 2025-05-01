@@ -29,10 +29,10 @@ const productSchema = new mongoose.Schema({
         min: [0, 'Price must be at least 0']
     },
     seller: {
-        type: mongoose.Schema.Types.ObjectId, 
-        ref: 'User',
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Seller', 
         required: [true, "Seller of product is required!"]
-    },
+      },
     weight: {
         type: String,  
         
